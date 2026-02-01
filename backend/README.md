@@ -1,59 +1,123 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ⚙️ Backend - Calculator API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este directorio contiene la lógica del servidor, construida con **Laravel 11**. Se encarga de procesar los cálculos matemáticos para garantizar la precisión y de persistir el historial de operaciones en MySQL.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🛠️ Requisitos del Sistema
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+*   **PHP:** >= 8.2
+*   **Composer:** Última versión
+*   **Base de Datos:** MySQL o MariaDB
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🚀 Instalación y Configuración
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1.  **Instalar dependencias:**
+    \`\`\`bash
+    composer install
+    \`\`\`
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2.  **Configurar entorno:**
+    \`\`\`bash
+    cp .env.example .env
+    php artisan key:generate
+    \`\`\`
 
-## Laravel Sponsors
+3.  **Configurar Base de Datos (`.env`):**
+    Asegurarse de crear una base de datos vacía (ej: `calc_app_db`) y configurar las credenciales:
+    \`\`\`env
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=calc_app_db
+    DB_USERNAME=root
+    DB_PASSWORD=
+    \`\`\`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4.  **Correr Migraciones:**
+    Esto creará la tabla `calculations` necesaria.
+    \`\`\`bash
+    php artisan migrate
+    \`\`\`
 
-### Premium Partners
+5.  **Iniciar Servidor:**
+    \`\`\`bash
+    php artisan serve
+    \`\`\`
+    El API estará disponible en `http://127.0.0.1:8000`.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 📡 Documentación de Endpoints (API)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+La API expone los siguientes endpoints RESTful para consumo del frontend.
 
-## Code of Conduct
+### 1. Realizar Cálculo
+Procesa una operación matemática y la guarda en el historial.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+*   **Método:** `POST`
+*   **URL:** `/api/calculate`
+*   **Headers:** `Content-Type: application/json`
+*   **Cuerpo (JSON):**
+    \`\`\`json
+    {
+        "num1": 10,
+        "operator": "+",
+        "num2": 5
+    }
+    \`\`\`
+    *Operadores soportados: `+`, `-`, `*`, `/`*
 
-## Security Vulnerabilities
+*   **Respuesta Exitosa (200 OK):**
+    \`\`\`json
+    {
+        "id": 1,
+        "num1": 10,
+        "operator": "+",
+        "num2": 5,
+        "result": 15,
+        "created_at": "2026-01-31T22:00:00.000000Z",
+        "updated_at": "2026-01-31T22:00:00.000000Z"
+    }
+    \`\`\`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+*   **Errores Comunes:**
+    *   `422 Unprocessable Entity`: Si falta algún dato o el formato es inválido.
+    *   `400 Bad Request`: División por cero.
 
-## License
+### 2. Obtener Historial
+Recupera las últimas operaciones realizadas.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+*   **Método:** `GET`
+*   **URL:** `/api/history`
+*   **Respuesta Exitosa (200 OK):**
+    \`\`\`json
+    [
+        {
+            "id": 2,
+            "num1": 100,
+            "operator": "/",
+            "num2": 2,
+            "result": 50,
+            "created_at": "..."
+        },
+        {
+            "id": 1,
+            "num1": 10,
+            "operator": "+",
+            "num2": 5,
+            "result": 15,
+            "created_at": "..."
+        }
+    ]
+    \`\`\`
+
+---
+
+## 📂 Estructura Clave
+
+*   `app/Http/Controllers/CalculatorController.php`: Lógica principal de los endpoints.
+*   `routes/api.php`: Definición de rutas.
+*   `database/migrations/xxxx_create_calculations_table.php`: Definición del esquema de BD.

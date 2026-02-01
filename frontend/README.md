@@ -1,59 +1,49 @@
-# Frontend
+# 🖥️ Frontend - Calculator UI
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+Interfaz de usuario moderna y reactiva, construida con **Angular 19** y **TailwindCSS**. Ofrece una experiencia de usuario fluida con soporte para temas, historial en tiempo real y teclado.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🛠️ Requisitos
 
-```bash
-ng serve
-```
+*   **Node.js:** >= 18 (LTS recomendado)
+*   **NPM:** Generalmente incluido con Node.js
+*   **Angular CLI:** (Opcional, se puede usar `npx ng`)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## 🚀 Instalación y Desarrollo
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+1.  **Instalar dependencias:**
+    \`\`\`bash
+    npm install
+    \`\`\`
 
-```bash
-ng generate component component-name
-```
+2.  **Iniciar servidor de desarrollo:**
+    \`\`\`bash
+    npm start
+    \`\`\`
+    La aplicación se abrirá en `http://localhost:4200`.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## 🏗️ Arquitectura de Componentes
 
-## Building
+La aplicación sigue una estructura modular limpia:
 
-To build the project run:
+*   **`src/app/components/calculator`**: Componente principal.
+    *   Maneja la lógica de entrada (teclado/botones).
+    *   Gestiona el estado visual y alertas de error.
+*   **`src/app/components/history`**: Vista de historial.
+    *   Consume el API para listar operaciones pasadas.
+*   **`src/app/services`**:
+    *   `calculator.service.ts`: Comunicación HTTP con el Backend.
+    *   `theme.service.ts`: Gestión del Modo Oscuro/Claro y persistencia en LocalStorage.
 
-```bash
-ng build
-```
+---
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-## Running unit tests
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## 🎨 Personalización
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+El diseño visual está centralizado en `tailwind.config.js`. Puedes ajustar la paleta de colores o el modo oscuro editando las clases `dark:` en los templates HTML.
