@@ -1,4 +1,5 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { ThemeService } from '../../services/theme.service';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CalculatorService, Operation } from '../../services/calculator.service';
@@ -13,6 +14,7 @@ import { RouterModule } from '@angular/router';
 })
 export class CalculatorComponent {
     private calculatorService = inject(CalculatorService);
+    public themeService = inject(ThemeService);
     private cdr = inject(ChangeDetectorRef);
 
     displayValue: string = '0';
