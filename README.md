@@ -98,10 +98,5 @@ Esta aplicación está lista para desplegarse en servidores compartidos como GoD
 
 ---
 
-## 📸 Capturas de Pantalla
-
-*(Espacio reservado para capturas del Modo Oscuro, Modo Claro y Historial)*
-
----
 
 Desarrollado con ❤️ por **D13G0ARJ** para demostración técnica.
