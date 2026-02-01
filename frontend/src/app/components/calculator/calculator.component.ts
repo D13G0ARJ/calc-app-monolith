@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { ThemeService } from '../../services/theme.service';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -124,5 +124,62 @@ export class CalculatorComponent {
         this.firstOperand = null;
         this.operator = null;
         this.waitingForSecondOperand = false;
+    }
+
+    @HostListener('window:keydown', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        const key = event.key;
+
+        // Numbers 0-9
+        if (/^[0-9]$/.test(key)) {
+            event.preventDefault();
+            this.inputDigit(key);
+            return;
+        }
+
+        // Operators
+        if (['+', '-', '*', '/'].includes(key)) {
+            event.preventDefault();
+            this.handleOperator(key);
+            return;
+        }
+
+        // Decimal
+        if (key === '.' || key === ',') {
+            event.preventDefault();
+            this.inputDecimal();
+            return;
+        }
+
+        // Calculate (Enter or =)
+        if (key === 'Enter' || key === '=') {
+            event.preventDefault();
+            this.calculate();
+            return;
+        }
+
+        // Reset (Escape)
+        if (key === 'Escape') {
+            event.preventDefault();
+            this.reset();
+            return;
+        }
+
+        // Backspace
+        if (key === 'Backspace') {
+            event.preventDefault();
+            this.handleBackspace();
+            return;
+        }
+    }
+
+    handleBackspace() {
+        if (this.waitingForSecondOperand) return;
+
+        if (this.displayValue.length > 1) {
+            this.displayValue = this.displayValue.slice(0, -1);
+        } else {
+            this.displayValue = '0';
+        }
     }
 }
