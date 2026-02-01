@@ -65,36 +65,79 @@ Para ejecutar todo el proyecto rápidamente en un entorno local:
 
 ---
 
-## 🌐 Guía de Despliegue (GoDaddy / Shared Hosting)
+## 🚀 Guía de Despliegue (GoDaddy / cPanel)
 
-Esta aplicación está lista para desplegarse en servidores compartidos como GoDaddy (cPanel).
+Esta aplicación utiliza una estrategia de despliegue "Monorepo Seguro". El código del Backend (Laravel) se aloja fuera del directorio público por seguridad, mientras que el Frontend (Angular) se sirve desde la raíz, comunicándose a través de una carpeta puente `/api`.
 
-### Paso 1: Backend (Laravel)
-1.  Subir el contenido de la carpeta `backend` a una carpeta privada en el hosting (ej: `/home/usuario/backend_calc`).
-2.  Mover el contenido de `backend/public` a la carpeta pública del dominio (ej: `/home/usuario/public_html`).
-3.  Editar `public_html/index.php` para apuntar a las rutas correctas:
-    \`\`\`php
-    require __DIR__.'/../backend_calc/vendor/autoload.php';
-    $app = require __DIR__.'/../backend_calc/bootstrap/app.php';
-    \`\`\`
-4.  Configurar el archivo `.env` en producción con las credenciales de base de datos del hosting.
+### 📂 Estructura del Servidor
+El objetivo es organizar los archivos en el hosting de la siguiente manera:
 
-### Paso 2: Frontend (Angular)
-1.  En el entorno local, construir la aplicación para producción:
-    \`\`\`bash
+```text
+/home/usuario/
+├── backend_final/       <-- Código fuente de Laravel (Privado/Oculto)
+└── public_html/         <-- Directorio Público (Accesible vía Web)
+    ├── api/             <-- Carpeta puente (Punto de entrada al Backend)
+    ├── index.html       <-- Archivo principal de Angular
+    └── (otros archivos del frontend...)
+```
+
+### Paso 1: Base de Datos (MySQL)
+1.  En cPanel, ir a "Bases de datos MySQL".
+2.  Crear una nueva base de datos y un nuevo usuario.
+3.  ⚠️ **CRÍTICO:** Asignar el usuario a la base de datos marcando la opción "Todos los Privilegios" (All Privileges).
+4.  Ir a phpMyAdmin, seleccionar la base de datos vacía e importar el archivo `.sql` de la estructura.
+
+### Paso 2: Backend (Laravel)
+1.  **Preparación:** Comprimir la carpeta `backend` completa (asegurando incluir la carpeta `vendor`) en un archivo llamado `backend.zip`.
+2.  **Subida:** En el Administrador de Archivos de cPanel, ir a la raíz del servidor (un nivel arriba de `public_html`) y crear la carpeta `backend_final`. Subir y descomprimir el zip allí.
+3.  **Configuración:** Renombrar `.env.example` a `.env` y configurar las credenciales de la base de datos del Paso 1.
+
+**Crear el Puente API:**
+1.  Ir a `public_html` y crear una carpeta llamada `api`.
+2.  Copiar el contenido de `backend_final/public/` (`index.php`, `.htaccess`, etc.) y pegarlo dentro de `public_html/api/`.
+3.  Editar `public_html/api/index.php` para apuntar a la carpeta privada, modificando las rutas `require` para subir dos niveles:
+
+```php
+// public_html/api/index.php
+
+// 1. Ajustar Maintenance Mode
+if (file_exists($maintenance = __DIR__.'/../../backend_final/storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+// 2. Ajustar Autoload
+require __DIR__.'/../../backend_final/vendor/autoload.php';
+
+// 3. Ajustar Bootstrap App
+$app = require_once __DIR__.'/../../backend_final/bootstrap/app.php';
+```
+
+### Paso 3: Frontend (Angular)
+1.  **Compilación:** En tu entorno local, ejecutar el build de producción:
+    ```bash
     cd frontend
-    npm run build
-    \`\`\`
-    *Esto generará la carpeta `dist/frontend/browser`.*
-2.  Subir el contenido de `dist/frontend/browser` a una subcarpeta en el hosting (ej: `/public_html/app`) o al directorio raíz si se desea que sea la app principal.
-3.  Si se usa una subcarpeta, asegurarse de construir con la base href correcta:
-    \`\`\`bash
-    npm run build -- --base-href=/app/
-    \`\`\`
+    ng build --configuration production
+    ```
+2.  **Subida:** Ir a la carpeta generada `dist/nombre-proyecto/browser`.
+3.  Subir únicamente el contenido de esa carpeta (archivos sueltos como `index.html`, `main.js`, `styles.css`) directamente a la raíz de `public_html`.
+    *Nota: Ten cuidado de no borrar la carpeta `api` creada en el paso anterior.*
 
-### Paso 3: Base de Datos
-1.  Crear la base de datos en el Panel del hosting.
-2.  Importar el esquema o ejecutar las migraciones si se tiene acceso SSH.
+### Paso 4: Enrutamiento (SPA Fix)
+Para que Angular maneje las rutas (como `/history`) sin generar errores 404 en el servidor, crear o editar el archivo `.htaccess` en la raíz de `public_html` con este contenido:
+
+```apache
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  
+  # 1. Permitir acceso a la API (Backend) sin redirigir
+  RewriteRule ^api/ - [L]
+
+  # 2. Redirigir cualquier otra ruta al index.html (Angular)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+```
 
 ---
 
