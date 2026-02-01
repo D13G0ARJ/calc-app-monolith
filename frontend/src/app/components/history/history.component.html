@@ -1,0 +1,63 @@
+<div class="min-h-screen bg-slate-100 p-4 lg:p-12">
+    <div class="max-w-2xl mx-auto">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8 fade-in">
+            <div class="flex items-center gap-4">
+                <a routerLink="/" class="text-slate-500 hover:text-blue-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    </svg>
+                </a>
+                <h1 class="text-3xl font-bold text-slate-800">History</h1>
+            </div>
+            <button (click)="loadHistory()"
+                class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="size-4" [class.animate-spin]="loading">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                Refresh
+            </button>
+        </div>
+
+        <!-- List -->
+        <div class="space-y-4">
+            @if (loading && history.length === 0) {
+            <div class="text-center py-12 text-slate-400 animate-pulse">
+                Loading history...
+            </div>
+            } @else if (history.length === 0) {
+            <div class="text-center py-12 text-slate-400 bg-white rounded-2xl shadow-sm">
+                No operations found.
+            </div>
+            } @else {
+            @for (op of history; track op.id; let i = $index) {
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between hover:shadow-md transition-shadow fade-in"
+                [style.animation-delay]="i * 50 + 'ms'">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold">
+                        {{ op.operator }}
+                    </div>
+                    <div>
+                        <div class="font-mono text-lg text-slate-800">
+                            {{ op.num1 }} <span class="text-slate-400 px-1">{{ op.operator }}</span> {{ op.num2 }}
+                        </div>
+                        <div class="text-xs text-slate-400">
+                            {{ op.created_at | date:'medium' }}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-2xl font-bold text-blue-600 font-mono">
+                    = {{ op.result }}
+                </div>
+            </div>
+            }
+            }
+        </div>
+
+    </div>
+</div>
